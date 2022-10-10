@@ -7,4 +7,6 @@
 **/logs
 **/dist
 
+node_modules
+src/assets/img
 ## front

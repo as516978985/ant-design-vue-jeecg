@@ -8,6 +8,8 @@ import router from './router'
 import store from './store/'
 import { VueAxios } from "@/utils/request"
 
+import '@/assets/iconfont/iconfont.css'
+
 require('@jeecg/antd-online-mini')
 require('@jeecg/antd-online-mini/dist/OnlineForm.css')
 
