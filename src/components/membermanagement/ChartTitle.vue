@@ -3,7 +3,7 @@
         <div class="title_left">
             <i class="iconfont icon-zoushi" />
             <span>数据统计</span>
-            <div class="task" v-for="item in taskList" :key="item.title">
+            <div class="task" v-for="item in taskList" :key="item.id">
                 <div class="square" :style="`background-color:${item.color}`"></div>
                 <span class="title">{{item.title}}</span>
             </div>

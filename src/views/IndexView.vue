@@ -5,7 +5,7 @@
     <div class='left'>
       <!-- 任务量 -->
       <div class='cardTask'>
-        <task-card v-for='item in cardList' :key='item.title' :taskList='item' />
+        <task-card v-for='item in cardList' :key='item.id' :taskList='item' />
       </div>
 
       <!-- 待办事项 -->
@@ -38,7 +38,7 @@
         </div>
         <!-- 日程 -->
         <div class='schedule'>
-          <schedule :itemList='scheduleList' />
+          <schedule :itemList='scheduleList' @ChangeFlag='changFlag' />
         </div>
       </div>
 
@@ -56,6 +56,7 @@ import Introduce from '../components/membermanagement/Introduce'
 import Calendar from '../components/membermanagement/Calendar.vue'
 import Schedule from '../components/membermanagement/Schedule'
 import Chart from '@/components/membermanagement/Chart'
+import { getAction } from '../api/manage'
 
 export default {
   name: 'Index',
@@ -63,7 +64,8 @@ export default {
     TaskCard, ChartTitle, CardEvent, Introduce, Calendar, Schedule, Chart
   },
   created() {
-
+    this.getTaskCard()
+    this.getSchedule()
   },
   mounted() {
   },
@@ -115,15 +117,52 @@ export default {
         // advance: "8",
         icon: 'icon-Leftbar_feature',
         checkFlag: 0
-      }]
+      }],
+
+      url: {
+        taskCard: 'http://localhost:8080/jeecg-boot/users/getTaskCard',
+        eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard',
+        userCard: 'http://localhost:8080/jeecg-boot/users/getUserInfo'
+      }
     }
   },
+
   methods: {
-    getUserMsg() {
-
+    /**
+     * 获取卡片信息数据
+     * @returns {Promise<void>}
+     */
+    async getTaskCard() {
+      const { data } = await getAction(this.url.taskCard, null)
+      this.cardList = data
+      console.log('cardList=', this.cardList)
     },
-    getSchedule() {
+    /**
+     * 获取日程数据
+     * @returns {Promise<void>}
+     */
+    async getSchedule() {
+      const { data } = await getAction(this.url.eventCard, null)
+      this.scheduleList = this.flagSort(data)
+      console.log('scheduleList=', this.scheduleList)
+    },
+    /**
+     * 根据flagCheck排序
+     * @param list
+     * @returns {*}
+     */
+    flagSort(list) {
+      list.sort((s, e) => {
+        return Number(s.checkFlag) - Number(e.checkFlag)
+      })
+      return list
+    },
 
+    changFlag() {
+      let temp = this.flagSort(this.scheduleList)
+      this.scheduleList = temp
+      console.log("打印一下scheduleList")
+      console.log(this.scheduleList)
     }
 
   }
@@ -177,7 +216,7 @@ body {
 .eventArea {
   display: flex;
   flex-direction: column;
-   height: 39.5vh;
+  height: 39.5vh;
   flex-grow: 1;
   padding: 0 2% 0 2%;
   max-height: calc(100% - 20% - 42%);

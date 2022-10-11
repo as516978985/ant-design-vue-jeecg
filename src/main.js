@@ -7,6 +7,7 @@ import Storage from 'vue-ls'
 import router from './router'
 import store from './store/'
 import { VueAxios } from "@/utils/request"
+import echarts from 'echarts'
 
 import '@/assets/iconfont/iconfont.css'
 
@@ -64,6 +65,7 @@ Vue.use(preview)
 Vue.use(vueBus);
 Vue.use(JeecgComponents);
 Vue.use(VueAreaLinkage);
+Vue.prototype.$echarts = echarts;
 
 SSO.init(() => {
   main()

@@ -1,23 +1,23 @@
 <template>
   <div>
-    <a-tabs default-active-key="1" @change="callback">
-      <a-tab-pane key="1" tab="我的日程">
-        <div class="content test-1">
+    <a-tabs default-active-key='1' @change='callback'>
+      <a-tab-pane key='1' tab='我的日程'>
+        <div class='content test-1'>
 
-          <a-card v-for="(item,index) in itemList" :key="index">
-            <div class="item">
-              <div class="item_title">
-                <i v-if="item.icon" :class="`iconfont size ${item.icon}`"></i>
+          <a-card v-for='(item,index) in itemList' :key='itemList.id'>
+            <div class='item'>
+              <div class='item_title'>
+                <i v-if='item.icon' :class='`iconfont size ${item.icon}`'></i>
                 <div>{{ item.title }}</div>
-                <input v-if="item.checkFlag===1" type="checkbox" @change="check(item)" checked>
-                <input v-else type="checkbox" @change="check(item)">
+                <input v-if='item.checkFlag==1' type='checkbox' @change='check(item)' checked>
+                <input v-else type='checkbox' @change='check(item)'>
               </div>
-              <div class="item_content">
-                <div class="item_one" v-if="item.time">
-                  <i class="iconfont icon-clock">{{ item.time }}</i>
+              <div class='item_content'>
+                <div class='item_one' v-if='item.startTime&&item.endTime'>
+                  <i class='iconfont icon-clock'>{{ item.startTime }}-{{ item.endTime }}</i>
                 </div>
-                <div class="item_two" v-if="item.advance">
-                  <i class="iconfont icon-notification"> 提前{{ item.advance }}分钟提醒</i>
+                <div class='item_two' v-if='item.advanceTime'>
+                  <i class='iconfont icon-notification'> 提前{{ item.advanceTime }}分钟提醒</i>
                 </div>
               </div>
             </div>
@@ -26,7 +26,7 @@
         </div>
 
       </a-tab-pane>
-      <a-tab-pane key="2" tab="笔记" force-render>
+      <a-tab-pane key='2' tab='笔记' force-render>
 
       </a-tab-pane>
     </a-tabs>
@@ -34,26 +34,35 @@
 </template>
 <script>
 export default {
-  props: ["itemList"],
+  props: ['itemList'],
   created() {
   },
   data() {
-    return {};
+    return {}
   },
+  // computed: {
+  //   order() {
+  //     return this.itemList.checkFlag == 1 ? 'order: 1' : 'order: 0'
+  //   }
+  // },
   methods: {
     callback(key) {
-      console.log(key);
+      console.log(key)
     },
     check(item) {
-      if (item.checkFlag===1){
-        item.checkFlag = 0;
-      }else {
-        item.checkFlag = 1;
+      if (item.checkFlag === 1) {
+        item.checkFlag = 0
+      } else {
+        item.checkFlag = 1
       }
+      console.log('方法执行开始')
+      this.$emit('ChangeFlag')
+      console.log('方法执行结束')
+
       console.log(item)
     }
-  },
-};
+  }
+}
 </script>
 <style scoped>
 * >>> .ant-tabs-nav .ant-tabs-tab {
@@ -99,6 +108,7 @@ export default {
 
 .item_title {
   display: flex;
+  width: 90%;
   flex-basis: 50%;
   font-weight: bold;
   justify-content: space-between;
