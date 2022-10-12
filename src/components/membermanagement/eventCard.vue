@@ -1,26 +1,26 @@
 <template>
-  <div class="card">
-    <div class="card_profile">
-      <div class="card_title">
-        <div class="event_card_title"><i class="iconfont icon-neirongfabu"></i>{{item.title}}</div>
-        <div class="card_content">{{item.content}}</div>
+  <div class='card'>
+    <div class='card_profile'>
+      <div class='card_title'>
+        <div class='event_card_title'><i class='iconfont icon-neirongfabu'></i>{{ item.title }}</div>
+        <div class='card_content'>{{ item.content }}</div>
       </div>
       <!-- <div class="card_img" v-html="'<img src='+'@/assets/img/photo.jpg'+'>'"> -->
-      <div class="card_img"><img :src="item.rightImg" /></div>
+      <div class='card_img'><img :src='item.rightImg' /></div>
     </div>
-    <div class="card_time">
-      <i class="iconfont icon-Leftbar_feature"></i>&nbsp;{{item.time}}
+    <div class='card_time'>
+      <i class='iconfont icon-Leftbar_feature'></i>&nbsp;{{ item.startTime }}-{{ item.endTime }}
     </div>
-    <div class="card_create">
-      <div class="profile_photo">
-        <img :src="item.leftImg">
-        <div>&nbsp; {{item.name}}</div>
+    <div class='card_create'>
+      <div class='profile_photo'>
+        <img :src='item.leftImg'>
+        <div>&nbsp; {{ item.name }}</div>
       </div>
-      <div class="created">创建于{{item.createdTime}}</div>
+      <div class='created'>创建于{{ item.createTime }}</div>
     </div>
-    <div class="card_request">
-      <div @click="agree">同意</div>
-      <div @click="refuse">拒绝</div>
+    <div class='card_request'>
+      <div @click='agree'>同意</div>
+      <div @click='refuse'>拒绝</div>
     </div>
   </div>
 
@@ -31,16 +31,16 @@
 export default {
   props: ['item'],
   data() {
-    return {
-    };
+    return {}
   },
   methods: {
     agree() {
-      console.log(this.item);
+      this.$emit("addAttention",this.item)
+      console.log(this.item)
     },
     refuse() {
-      console.log(this.item);
-    },
+      console.log(this.item)
+    }
   }
 }
 </script>
@@ -92,7 +92,7 @@ export default {
   flex-basis: 18%;
 }
 
-.card_img>img {
+.card_img > img {
   margin-top: 0.5vh;
   height: 6vh;
   width: 6vh;
@@ -128,7 +128,7 @@ export default {
   align-items: center;
 }
 
-.profile_photo>img {
+.profile_photo > img {
   margin: 0;
   height: 6vh;
   width: 6vh;
@@ -144,7 +144,7 @@ export default {
   margin: 0 5%;
 }
 
-.card_request>div {
+.card_request > div {
   margin-left: 10%;
   font-weight: bolder;
   color: #3cb58f;

@@ -10,7 +10,7 @@
 
       <!-- 待办事项 -->
       <div class='eventArea'>
-        <card-event />
+        <card-event ref='eventAreaRef' />
       </div>
 
       <!-- 图表 -->
@@ -38,7 +38,7 @@
         </div>
         <!-- 日程 -->
         <div class='schedule'>
-          <schedule :itemList='scheduleList' @ChangeFlag='changFlag' />
+          <schedule :itemList='scheduleList' />
         </div>
       </div>
 
@@ -51,11 +51,11 @@
 <script>
 import TaskCard from '../components/membermanagement/TaskCard.vue'
 import ChartTitle from '../components/membermanagement/ChartTitle.vue'
-import CardEvent from '@/components/membermanagement/CardEvent'
+import CardEvent from '../components/membermanagement/CardEvent'
 import Introduce from '../components/membermanagement/Introduce'
 import Calendar from '../components/membermanagement/Calendar.vue'
 import Schedule from '../components/membermanagement/Schedule'
-import Chart from '@/components/membermanagement/Chart'
+import Chart from '../components/membermanagement/Chart'
 import { getAction } from '../api/manage'
 
 export default {
@@ -65,12 +65,15 @@ export default {
   },
   created() {
     this.getTaskCard()
+    this.getEventCard()
+    this.getUserInfo()
     this.getSchedule()
   },
   mounted() {
   },
   data() {
     return {
+      userId: 1,
       // 前后端需要对个数和百分数做限制，否则可能会导致卡片样式改变
       cardList: [{
         title: '本月新增任务量',
@@ -100,32 +103,18 @@ export default {
         department: '上海部门-产品-UI设计'
       },
 
-      scheduleList: [{
-        title: '例会：汇报本周工作内容',
-        time: '9:30-10:30',
-        advance: '6',
-        icon: 'icon-Leftbar_feature',
-        checkFlag: 1
-      }, {
-        title: '例会：汇报本周工作内容',
-        // time: "9:30-10:30",
-        advance: '7',
-        checkFlag: 0
-      }, {
-        title: '例会：汇报本周工作内容',
-        // time: "9:30-10:30",
-        // advance: "8",
-        icon: 'icon-Leftbar_feature',
-        checkFlag: 0
-      }],
+      scheduleList: [],
 
       url: {
         taskCard: 'http://localhost:8080/jeecg-boot/users/getTaskCard',
-        eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard',
-        userCard: 'http://localhost:8080/jeecg-boot/users/getUserInfo'
+        scheduleCard: 'http://localhost:8080/jeecg-boot/users/getScheduleCard',
+        userCard: 'http://localhost:8080/jeecg-boot/users/getUserInfo',
+        eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard'
+
       }
     }
   },
+
 
   methods: {
     /**
@@ -135,38 +124,33 @@ export default {
     async getTaskCard() {
       const { data } = await getAction(this.url.taskCard, null)
       this.cardList = data
-      console.log('cardList=', this.cardList)
+      // console.log('cardList=', this.cardList)
     },
     /**
+     * TODO 收到数据之后排序还有bug
      * 获取日程数据
      * @returns {Promise<void>}
      */
     async getSchedule() {
-      const { data } = await getAction(this.url.eventCard, null)
-      this.scheduleList = this.flagSort(data)
-      console.log('scheduleList=', this.scheduleList)
+      const { data } = await getAction(this.url.scheduleCard, null)
+      this.scheduleList = data
+      // this.scheduleList = this.flagSort(data)
+      console.log('获取到scheduleList数据，未排序', this.scheduleList)
     },
-    /**
-     * 根据flagCheck排序
-     * @param list
-     * @returns {*}
-     */
-    flagSort(list) {
-      list.sort((s, e) => {
-        return Number(s.checkFlag) - Number(e.checkFlag)
-      })
-      return list
+    async getUserInfo() {
+      const { data } = await getAction(this.url.userCard + `/${this.userId}`)
+      this.userMsg = data
     },
-
-    changFlag() {
-      let temp = this.flagSort(this.scheduleList)
-      this.scheduleList = temp
-      console.log("打印一下scheduleList")
-      console.log(this.scheduleList)
+    async getEventCard() {
+      const { data } = await getAction(this.url.eventCard + `/${this.userId}`)
+      this.$refs.eventAreaRef.itemList = [...data.filter(item => {
+        return item.attentionFlag === '0'
+      })]
+      this.$refs.eventAreaRef.attentions = [...data.filter(item => {
+        return item.attentionFlag === '1'
+      })]
     }
-
   }
-
 }
 </script>
 

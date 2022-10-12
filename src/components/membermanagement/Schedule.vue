@@ -4,7 +4,7 @@
       <a-tab-pane key='1' tab='我的日程'>
         <div class='content test-1'>
 
-          <a-card v-for='(item,index) in itemList' :key='itemList.id'>
+          <a-card v-for='item in itemList' :key='itemList.id'>
             <div class='item'>
               <div class='item_title'>
                 <i v-if='item.icon' :class='`iconfont size ${item.icon}`'></i>
@@ -36,9 +36,23 @@
 export default {
   props: ['itemList'],
   created() {
+    console.log("scheduleList的值为",this.scheduleList)
+  },
+  mounted() {
+    // console.log("子组件收到scheduleList数据",this.itemList)
+    // console.log('将父组件接到的数据转存到scheduleList中')
+    // console.log("从父组件收到的值",this.itemList)
+    // console.log("排序开始")
+    // console.log('将父组件接到的数据转存到scheduleList中')
+    // this.scheduleList=[...this.flagSort(this.itemList)]
+    // console.log("排序结束")
+    // console.log("现在scheduleList的值为",this.scheduleList)
+    // console.log("准备将值交给for循环")
   },
   data() {
-    return {}
+    return {
+      scheduleList:[]
+    }
   },
   // computed: {
   //   order() {
@@ -49,17 +63,28 @@ export default {
     callback(key) {
       console.log(key)
     },
+    /**
+     * 勾选日程框
+     * @param item
+     */
     check(item) {
+      console.log("被改变的item",item)
       if (item.checkFlag === 1) {
         item.checkFlag = 0
       } else {
         item.checkFlag = 1
       }
-      console.log('方法执行开始')
-      this.$emit('ChangeFlag')
-      console.log('方法执行结束')
-
-      console.log(item)
+    },
+    /**
+     * 根据flagCheck排序
+     * @param list
+     * @returns {*}
+     */
+    flagSort(list) {
+      list.sort((s, e) => {
+        return Number(s.checkFlag) - Number(e.checkFlag)
+      })
+      return list
     }
   }
 }
