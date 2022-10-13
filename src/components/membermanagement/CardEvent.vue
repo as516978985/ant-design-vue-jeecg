@@ -9,7 +9,7 @@
 
       <a-tab-pane key='2' tab='关注任务'>
         <div class='event_content test-1'>
-          <event-card v-for='item in attentions' :key='item.id' :item='item' />
+          <event-card v-for='item in attentions' :key='item.id' :item='item' @addAttention='addAttention' />
         </div>
       </a-tab-pane>
 
@@ -21,7 +21,7 @@
 </template>
 <script>
 import eventCard from './eventCard.vue'
-import {getAction,postAction} from '../../api/manage'
+import { getAction, postAction } from '../../api/manage'
 
 export default {
   components: {
@@ -36,7 +36,7 @@ export default {
       attentions: [],
 
       url: {
-        changeAttention: 'http://localhost:8080/jeecg-boot/users/changeEventCardAttention'
+        changeAttention: 'http://localhost:8080/jeecg-boot/users/changeEventCardAttention/'
       }
 
     }
@@ -54,9 +54,13 @@ export default {
      * @param val
      */
     async addAttention(val) {
-      console.log('打印一下收到的关注信息！！！')
-      console.log(val.id)
-      let { data } = await getAction(this.url.changeAttention, val.id)
+      let { data } = await getAction(this.url.changeAttention + `${val.id}`)
+      this.itemList = [...data.filter(item => {
+        return item.attentionFlag === '0'
+      })]
+      this.attentions = [...data.filter(item => {
+        return item.attentionFlag === '1'
+      })]
 
       // this.itemList = [...val.filter(item => {
       //   return item.attentionFlag === '0'

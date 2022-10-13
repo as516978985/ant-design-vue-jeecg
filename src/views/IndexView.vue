@@ -29,7 +29,7 @@
       <div class='right_content'>
         <!-- 个人介绍 -->
         <div class='introduce_out'>
-          <introduce :userMsg='userMsg' />
+          <introduce ref='introduceRef' />
         </div>
         <!-- 日历 -->
         <div class='calendar'>
@@ -38,7 +38,7 @@
         </div>
         <!-- 日程 -->
         <div class='schedule'>
-          <schedule :itemList='scheduleList' />
+          <schedule ref='scheduleRef' />
         </div>
       </div>
 
@@ -69,54 +69,40 @@ export default {
     this.getUserInfo()
     this.getSchedule()
   },
-  mounted() {
-  },
+
   data() {
     return {
+      //用户id，需要登录后获取到
       userId: 1,
-      // 前后端需要对个数和百分数做限制，否则可能会导致卡片样式改变
-      cardList: [{
-        title: '本月新增任务量',
-        count: 10,
-        percent: 10,
-        color: '#9c77f6'
-      }, {
-        title: '本月进行中任务量',
-        count: 20,
-        percent: 20,
-        color: '#5686fe'
-      }, {
-        title: '本月完成任务量',
-        count: 100,
-        percent: 300,
-        color: '#00b691'
-      }, {
-        title: '本月延期任务量',
-        count: 15,
-        percent: -10,
-        color: '#ff4b43'
-      }],
-
-      userMsg: {
-        img: require('../assets/img/people.jpg'),
-        name: '刘美丽',
-        department: '上海部门-产品-UI设计'
-      },
-
-      scheduleList: [],
-
+      cardList: [],
       url: {
         taskCard: 'http://localhost:8080/jeecg-boot/users/getTaskCard',
         scheduleCard: 'http://localhost:8080/jeecg-boot/users/getScheduleCard',
         userCard: 'http://localhost:8080/jeecg-boot/users/getUserInfo',
         eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard'
-
       }
     }
   },
 
-
   methods: {
+    dataCompare(field, method) {
+      // 第二个参数没有传递，默认升序排序
+      if (method === undefined) {
+        method = 1
+      } else {
+        method = method ? 1 : -1
+      }
+      return function(obj1, obj2) {
+        // 方括号也是访问对象属性的一种方式，优点是可以通过变量访问。
+        // 常规写法是 var val1 = obj1.prop;var val2 = obj2.prop;,但是这种不支持变量写法，所有这里不适用
+        var val1 = obj1[field],
+          val2 = obj2[field]
+
+        // 若是升序排序，此时rev=1,rev*-1=-1,等价于return val1 < val2 ? -1 : 1,，即val1<val2时，val1放在val2前面，否则放后面
+        // 若是降序排序，下面句子等价于return val1 < val2 ? 1 : -1，即val1<val2时，val1放在val2后面，否则放在val2前面
+        return val1 < val2 ? method * (-1) : method * 1
+      }
+    },
     /**
      * 获取卡片信息数据
      * @returns {Promise<void>}
@@ -124,7 +110,6 @@ export default {
     async getTaskCard() {
       const { data } = await getAction(this.url.taskCard, null)
       this.cardList = data
-      // console.log('cardList=', this.cardList)
     },
     /**
      * TODO 收到数据之后排序还有bug
@@ -132,15 +117,32 @@ export default {
      * @returns {Promise<void>}
      */
     async getSchedule() {
+
+      // var formData = new FormData();
+      // formData.append("userId",1)
+      // formData.append("date","2022-10-15")
+
       const { data } = await getAction(this.url.scheduleCard, null)
-      this.scheduleList = data
-      // this.scheduleList = this.flagSort(data)
-      console.log('获取到scheduleList数据，未排序', this.scheduleList)
+      this.$nextTick(() => {
+        this.$refs.scheduleRef.scheduleList =
+          [...data.filter(item => item.checkFlag === '0').sort(this.dataCompare('modifyTime', false)),
+            ...data.filter(item => item.checkFlag === '1').sort(this.dataCompare('modifyTime', true))]
+      })
     },
+    /**
+     * 获取用户信息数据
+     * @returns {Promise<void>}
+     */
     async getUserInfo() {
       const { data } = await getAction(this.url.userCard + `/${this.userId}`)
-      this.userMsg = data
+      this.$nextTick(() => {
+        this.$refs.introduceRef.userInfo = data
+      })
     },
+    /**
+     * 获取代办事项卡片数据
+     * @returns {Promise<void>}
+     */
     async getEventCard() {
       const { data } = await getAction(this.url.eventCard + `/${this.userId}`)
       this.$refs.eventAreaRef.itemList = [...data.filter(item => {
@@ -153,7 +155,6 @@ export default {
   }
 }
 </script>
-
 
 <style>
 body {

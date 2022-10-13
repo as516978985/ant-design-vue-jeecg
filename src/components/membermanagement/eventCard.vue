@@ -19,8 +19,8 @@
       <div class='created'>创建于{{ item.createTime }}</div>
     </div>
     <div class='card_request'>
-      <div @click='agree'>同意</div>
-      <div @click='refuse'>拒绝</div>
+      <div @click='agree' v-if='item.attentionFlag=="0"'>关注任务</div>
+      <div @click='agree'v-else>取消关注</div>
     </div>
   </div>
 

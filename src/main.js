@@ -8,6 +8,7 @@ import router from './router'
 import store from './store/'
 import { VueAxios } from "@/utils/request"
 import echarts from 'echarts'
+import moment from 'moment'
 
 import '@/assets/iconfont/iconfont.css'
 
@@ -66,6 +67,8 @@ Vue.use(vueBus);
 Vue.use(JeecgComponents);
 Vue.use(VueAreaLinkage);
 Vue.prototype.$echarts = echarts;
+Vue.prototype.$moment = moment
+
 
 SSO.init(() => {
   main()
