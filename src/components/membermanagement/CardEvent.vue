@@ -54,7 +54,9 @@ export default {
      * @param val
      */
     async addAttention(val) {
-      let { data } = await getAction(this.url.changeAttention + `${val.id}`)
+      let params = new URLSearchParams()
+      params.append('id', `${val.id}`)
+      let { data } = await postAction(this.url.changeAttention, params)
       this.itemList = [...data.filter(item => {
         return item.attentionFlag === '0'
       })]

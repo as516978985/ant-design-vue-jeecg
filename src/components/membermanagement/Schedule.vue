@@ -8,12 +8,13 @@
             <div class='item'>
               <div class='item_title'>
                 <i v-if='item.icon' :class='`iconfont size ${item.icon}`'></i>
-                <div>{{ item.title }}</div>
+                <div v-if='item.checkFlag==1' style='color: #bec1c0'>{{ item.title }}</div>
+                <div v-else>{{ item.title }}</div>
                 <input v-if='item.checkFlag==1' type='checkbox' @change='check(item)' checked>
                 <input v-else type='checkbox' @change='check(item)'>
               </div>
               <div class='item_content'>
-                <div class='item_one' v-if='item.startTime&&item.endTime'>
+                <div class='item_one' v-if='item.startTime && item.endTime'>
                   <i class='iconfont icon-clock'>{{ item.startTime }}-{{ item.endTime }}</i>
                 </div>
                 <div class='item_two' v-if='item.advanceTime'>
@@ -27,7 +28,35 @@
 
       </a-tab-pane>
       <a-tab-pane key='2' tab='笔记' force-render>
+        <div class='content test-1'>
+          <textarea class='addNote test-1' type='text' v-model='addNoteContext' @keyup.enter='addNote'
+                    placeholder='添加笔记 回车确认' />
+          <a-card v-for='item in noteList' :key='item.userId'>
+            <div class='item_note'>
+              <div class='note_title'>
+                <div>
+                  <input v-if='item.checkFlag==1' type='checkbox' @change='checkNote(item)' checked>
+                  <input v-else type='checkbox' @change='checkNote(item)'>
+                </div>
+                <div class='note_create_time' v-if='item.checkFlag==1' style='color: #bec1c0'>笔记创建时间：
+                  {{ item.createTime }}
+                </div>
+                <div class='note_create_time' v-else>笔记创建时间：{{ item.createTime }}</div>
+              </div>
+              <div class='note_content' v-if='item.checkFlag==1' style='color: #bec1c0'>
+                {{ item.content }}
+              </div>
+              <div class='note_content' v-else>
+                {{ item.content }}
+              </div>
 
+              <div class='note_content'>
+
+              </div>
+            </div>
+
+          </a-card>
+        </div>
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -36,15 +65,16 @@
 import { getAction, postAction } from '../../api/manage'
 
 export default {
-  // created() {
-  //   console.log('scheduleList的值为', this.scheduleList)
-  // },
-  updated() {
-    console.log('现在scheduleList的值为', this.scheduleList)
-  },
   data() {
     return {
       scheduleList: [],
+      noteList: [{
+        userId: 1,
+        checkFlag: 1,
+        createTime: '2022-10-14',
+        content: '读取到的笔记内容读取到的笔记内容读取到的笔记内容读取到的笔记内容读取到的笔记内容读取到的笔记内容'
+      }],
+      addNoteContext: '',
       url: {
         changeScheduleFlag: 'http://localhost:8080/jeecg-boot/users/changeScheduleFlag'
       }
@@ -64,42 +94,60 @@ export default {
      */
     async check(item) {
       console.log('被改变的item', item)
-      let { data } = await getAction(this.url.changeScheduleFlag + `/${item.id}`)
+      let params = new URLSearchParams()
+      params.append('scheduleId', `${item.id}`)
+      params.append('userId', `${item.userId}`)
+      params.append('date', `${item.recDate}`)
+      let { data } = await postAction(this.url.changeScheduleFlag, params)
+      console.log('获得的数据为：', data)
       this.scheduleList =
         [...data.filter(item => item.checkFlag === '0').sort(this.dataCompare('modifyTime', false)),
-          ...data.filter(item => item.checkFlag === '1').sort(this.dataCompare('modifyTime',true))]
+          ...data.filter(item => item.checkFlag === '1').sort(this.dataCompare('modifyTime', true))]
     },
 
     /**
      * 排序
-     * @param field
-     * @param method
+     * @param field 字段，此处用[]取字段，因为.用不了
+     * @param method 第二个参数没有传递，默认升序排序
      * @returns {function(*, *): number}
      */
     dataCompare(field, method) {
-      // 第二个参数没有传递，默认升序排序
+
       if (method === undefined) {
         method = 1
       } else {
         method = method ? 1 : -1
       }
       return function(obj1, obj2) {
-        // 方括号也是访问对象属性的一种方式，优点是可以通过变量访问。
-        // 常规写法是 var val1 = obj1.prop;var val2 = obj2.prop;,但是这种不支持变量写法，所有这里不适用
         var val1 = obj1[field],
           val2 = obj2[field]
-
-        // 若是升序排序，此时rev=1,rev*-1=-1,等价于return val1 < val2 ? -1 : 1,，即val1<val2时，val1放在val2前面，否则放后面
-        // 若是降序排序，下面句子等价于return val1 < val2 ? 1 : -1，即val1<val2时，val1放在val2后面，否则放在val2前面
         return val1 < val2 ? method * (-1) : method * 1
       }
+    },
+    checkNote(item) {
+      if (item.checkFlag == 1) {
+        item.checkFlag = 0
+      } else {
+        item.checkFlag = 1
+      }
+      console.log('勾选了笔记：', item)
+    },
+
+    addNote() {
+      console.log(this.addNoteContext)
+      let newNote = new Object()
+      newNote
+
+
+      this.addNoteContext = ''
     }
   }
 }
 </script>
 <style scoped>
 * >>> .ant-tabs-nav .ant-tabs-tab {
-  width: 22.3vh !important;
+  width: 83% !important;
+  /*width: inherit !important;*/
   margin: 0;
   text-align: center !important;
 }
@@ -170,12 +218,15 @@ export default {
 }
 
 .item_one {
-  flex-basis: 30%;
   border: 0;
+  width: fit-content;
+  margin-right: 3%;
 }
 
 .item_two {
   border: 0;
+  width: fit-content;
+
 }
 
 .item_content i {
@@ -185,6 +236,34 @@ export default {
   margin: 0;
   padding: 0;
 }
+
+.addNote {
+  border: 1px solid gray;
+  border-radius: 10px;
+  width: 100%;
+  height: 25%;
+}
+
+.item_note {
+  display: flex;
+  flex-basis: 20%;
+  flex-direction: column;
+  background-color: #f6f9f8;
+  /*color: black;*/
+  padding: 2%;
+}
+
+.note_title {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2%;
+}
+
+.note_content {
+  margin-top: 2%;
+  text-indent: 2em;
+}
+
 
 .test-1::-webkit-scrollbar {
   /*滚动条整体样式*/

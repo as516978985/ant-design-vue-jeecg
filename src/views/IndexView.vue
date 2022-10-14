@@ -33,7 +33,7 @@
         </div>
         <!-- 日历 -->
         <div class='calendar'>
-          <calendar />
+          <calendar @clickDay='getScheduleByClickDay' />
 
         </div>
         <!-- 日程 -->
@@ -56,7 +56,7 @@ import Introduce from '../components/membermanagement/Introduce'
 import Calendar from '../components/membermanagement/Calendar.vue'
 import Schedule from '../components/membermanagement/Schedule'
 import Chart from '../components/membermanagement/Chart'
-import { getAction } from '../api/manage'
+import { getAction, postAction } from '../api/manage'
 
 export default {
   name: 'Index',
@@ -79,12 +79,49 @@ export default {
         taskCard: 'http://localhost:8080/jeecg-boot/users/getTaskCard',
         scheduleCard: 'http://localhost:8080/jeecg-boot/users/getScheduleCard',
         userCard: 'http://localhost:8080/jeecg-boot/users/getUserInfo',
-        eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard'
+        eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard',
+        getNote: 'http://localhost:8080/jeecg-boot/users/getNote'
       }
     }
   },
 
   methods: {
+    /**
+     * 获取当前时间 yyyy-MM-dd hh:mm:ss
+     * @returns {string}
+     */
+    getCurrentTime() {
+      var date = new Date()
+      var year = date.getFullYear() //月份从0~11，所以加一
+      var dateArr = [date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()]
+      for (var i = 0; i < dateArr.length; i++) {
+        if (dateArr[i] >= 1 && dateArr[i] <= 9) {
+          dateArr[i] = '0' + dateArr[i]
+        }
+      }
+      var strDate = year + '-' + dateArr[0] + '-' + dateArr[1] + ' ' + dateArr[2] + ':' + dateArr[3] + ':' + dateArr[4]
+
+      return strDate
+    },
+    /**
+     * 获取当前日期 yyyy-MM-dd
+     */
+    getCurrentDateOfYMd(formData) {
+      let time
+      if (formData === undefined) {
+        time = new Date()
+      } else {
+        time = new Date(formData)
+      }
+      return time.toLocaleDateString().replaceAll('/', '-')
+    },
+
+    /**
+     * 根据收到的数据中的字段进行排序
+     * @param field 字段
+     * @param method 排序方式 true升序（默认） false降序
+     * @returns {function(*, *): number}
+     */
     dataCompare(field, method) {
       // 第二个参数没有传递，默认升序排序
       if (method === undefined) {
@@ -111,24 +148,7 @@ export default {
       const { data } = await getAction(this.url.taskCard, null)
       this.cardList = data
     },
-    /**
-     * TODO 收到数据之后排序还有bug
-     * 获取日程数据
-     * @returns {Promise<void>}
-     */
-    async getSchedule() {
 
-      // var formData = new FormData();
-      // formData.append("userId",1)
-      // formData.append("date","2022-10-15")
-
-      const { data } = await getAction(this.url.scheduleCard, null)
-      this.$nextTick(() => {
-        this.$refs.scheduleRef.scheduleList =
-          [...data.filter(item => item.checkFlag === '0').sort(this.dataCompare('modifyTime', false)),
-            ...data.filter(item => item.checkFlag === '1').sort(this.dataCompare('modifyTime', true))]
-      })
-    },
     /**
      * 获取用户信息数据
      * @returns {Promise<void>}
@@ -151,6 +171,53 @@ export default {
       this.$refs.eventAreaRef.attentions = [...data.filter(item => {
         return item.attentionFlag === '1'
       })]
+    },
+    /**
+     * 获取日程数据
+     * @param day
+     * @returns {Promise<void>}
+     */
+    async getSchedule(day) {
+      let params = new URLSearchParams()
+      params.append('userId', `${this.userId}`)
+
+      if (day === undefined) {
+        params.append('date', `${this.getCurrentDateOfYMd()}`)
+      } else {
+        params.append('date', `${day}`)
+      }
+      const { data } = await postAction(this.url.scheduleCard, params)
+      this.$nextTick(() => {
+        this.$refs.scheduleRef.scheduleList =
+          [...data.filter(item => item.checkFlag === '0').sort(this.dataCompare('modifyTime', false)),
+            ...data.filter(item => item.checkFlag === '1').sort(this.dataCompare('modifyTime', true))]
+      })
+    },
+
+    /**
+     * 点击获取日程数据
+     * @param date
+     */
+    getScheduleByClickDay(date) {
+      let clickDay = this.getCurrentDateOfYMd(date._d)
+      this.getSchedule(clickDay)
+    },
+
+    async getNote(day) {
+      let params = new URLSearchParams()
+      params.append('userId', `${this.userId}`)
+
+      if (day === undefined) {
+        params.append('date', `${this.getCurrentDateOfYMd()}`)
+      } else {
+        params.append('date', `${day}`)
+      }
+      // const { data } = await postAction(this.url.getNote, params)
+      // this.$nextTick(() => {
+      //   this.$refs.scheduleRef.noteList =
+      //     [...data.filter(item => item.checkFlag === '0'),
+      //       ...data.filter(item => item.checkFlag === '1')]
+      // })
     }
   }
 }

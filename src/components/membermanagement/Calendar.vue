@@ -1,5 +1,5 @@
 <template>
-  <div :style="{ width: '300px', border: '1px solid #d9d9d9', borderRadius: '4px' }">
+  <div >
     <a-calendar :fullscreen='false' @panelChange='onPanelChange' @select='onSelect' />
   </div>
 </template>
@@ -10,8 +10,7 @@ export default {
       console.log(value, mode)
     },
     onSelect(date) {
-      console.log(date)
-      console.log(typeof (date._d))
+      this.$emit("clickDay",date)
     }
   }
 }

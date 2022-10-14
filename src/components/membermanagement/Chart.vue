@@ -130,16 +130,20 @@ export default {
 }
 
 #main {
-  /*width: 100%;*/
+  width: 100%;
   /*height: 100%;*/
   /*修改为下面代码*/
-  width: 74.5vw;
+  /*width: 74.5vw;*/
   height: 34vh;
 }
 
+/*#main div {*/
+/*  width: 100%;*/
+/*}*/
+
 /*增加下面代码*/
 canvas {
-  width: 92% !important;
+  width: 100px !important;
   height: 34.1% !important;
   /*width: 69.5vw !important;*/
   /*height: 34.1vh !important;*/
