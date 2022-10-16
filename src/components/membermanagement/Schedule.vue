@@ -31,7 +31,8 @@
         <div class='content test-1'>
           <textarea class='addNote test-1' type='text' v-model='addNoteContext' @keyup.enter='addNote'
                     placeholder='添加笔记 回车确认' />
-          <a-card v-for='item in noteList' :key='item.userId'>
+
+          <a-card v-for='item in noteList' :key='item.id'>
             <div class='item_note'>
               <div class='note_title'>
                 <div>
@@ -65,6 +66,9 @@
 import { getAction, postAction } from '../../api/manage'
 
 export default {
+  // created() {
+  //   console.log("S区",this.checkedDay)
+  // },
   data() {
     return {
       scheduleList: [],
@@ -133,12 +137,17 @@ export default {
       console.log('勾选了笔记：', item)
     },
 
-    addNote() {
-      console.log(this.addNoteContext)
-      let newNote = new Object()
-      newNote
 
+    /**
+     * 添加笔记
+     * @returns {Promise<void>}
+     */
+    async addNote() {
+      console.log("checkDay",this.checkedDay)
+      console.log("看一下输入的内容",this.addNoteContext)
 
+      console.log("子数据",this.addNoteContext)
+      this.$emit("addNote",this.addNoteContext)
       this.addNoteContext = ''
     }
   }

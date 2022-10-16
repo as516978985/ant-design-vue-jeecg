@@ -38,7 +38,7 @@
         </div>
         <!-- 日程 -->
         <div class='schedule'>
-          <schedule ref='scheduleRef' />
+          <schedule ref='scheduleRef' @addNote='increaseNote' />
         </div>
       </div>
 
@@ -68,6 +68,7 @@ export default {
     this.getEventCard()
     this.getUserInfo()
     this.getSchedule()
+    this.getNote()
   },
 
   data() {
@@ -75,17 +76,36 @@ export default {
       //用户id，需要登录后获取到
       userId: 1,
       cardList: [],
+      checkedDay: '',
       url: {
         taskCard: 'http://localhost:8080/jeecg-boot/users/getTaskCard',
         scheduleCard: 'http://localhost:8080/jeecg-boot/users/getScheduleCard',
         userCard: 'http://localhost:8080/jeecg-boot/users/getUserInfo',
         eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard',
-        getNote: 'http://localhost:8080/jeecg-boot/users/getNote'
+        getNote: 'http://localhost:8080/jeecg-boot/users/getNote',
+        addNote: 'http://localhost:8080/jeecg-boot/users/addNote'
       }
     }
   },
 
   methods: {
+    async increaseNote(context) {
+      console.log('看一下时间', this.checkedDay)
+      let params = new URLSearchParams()
+      params.append('content', context)
+      params.append('date', `${this.checkedDay}`)
+      params.append('userId', `${this.userId}`)
+
+      let { data } = await postAction(this.url.addNote, params)
+      this.$nextTick(() => {
+        this.$refs.scheduleRef.noteList =
+          [...data.filter(item => item.checkFlag === '0'),
+            ...data.filter(item => item.checkFlag === '1')]
+      })
+
+
+    },
+
     /**
      * 获取当前时间 yyyy-MM-dd hh:mm:ss
      * @returns {string}
@@ -103,6 +123,7 @@ export default {
 
       return strDate
     },
+
     /**
      * 获取当前日期 yyyy-MM-dd
      */
@@ -140,6 +161,7 @@ export default {
         return val1 < val2 ? method * (-1) : method * 1
       }
     },
+
     /**
      * 获取卡片信息数据
      * @returns {Promise<void>}
@@ -159,6 +181,7 @@ export default {
         this.$refs.introduceRef.userInfo = data
       })
     },
+
     /**
      * 获取代办事项卡片数据
      * @returns {Promise<void>}
@@ -172,6 +195,7 @@ export default {
         return item.attentionFlag === '1'
       })]
     },
+
     /**
      * 获取日程数据
      * @param day
@@ -201,23 +225,31 @@ export default {
     getScheduleByClickDay(date) {
       let clickDay = this.getCurrentDateOfYMd(date._d)
       this.getSchedule(clickDay)
+      this.getNote(clickDay)
     },
 
+    /**
+     * 获取笔记数据
+     * @param day
+     * @returns {Promise<void>}
+     */
     async getNote(day) {
       let params = new URLSearchParams()
       params.append('userId', `${this.userId}`)
-
       if (day === undefined) {
+        this.checkedDay = this.getCurrentDateOfYMd()
         params.append('date', `${this.getCurrentDateOfYMd()}`)
       } else {
+        this.checkedDay = day
         params.append('date', `${day}`)
       }
-      // const { data } = await postAction(this.url.getNote, params)
-      // this.$nextTick(() => {
-      //   this.$refs.scheduleRef.noteList =
-      //     [...data.filter(item => item.checkFlag === '0'),
-      //       ...data.filter(item => item.checkFlag === '1')]
-      // })
+      const { data } = await postAction(this.url.getNote, params)
+      console.log('看一下笔记数据', data)
+      this.$nextTick(() => {
+        this.$refs.scheduleRef.noteList =
+          [...data.filter(item => item.checkFlag === '0'),
+            ...data.filter(item => item.checkFlag === '1')]
+      })
     }
   }
 }
