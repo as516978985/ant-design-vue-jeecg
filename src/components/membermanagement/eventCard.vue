@@ -20,7 +20,7 @@
     </div>
     <div class='card_request'>
       <div @click='agree' v-if='item.attentionFlag=="0"'>关注任务</div>
-      <div @click='agree'v-else>取消关注</div>
+      <div @click='agree' v-else>取消关注</div>
     </div>
   </div>
 
@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     agree() {
-      this.$emit("addAttention",this.item)
+      this.$emit('addAttention', this.item)
       console.log(this.item)
     },
     refuse() {
@@ -48,15 +48,15 @@ export default {
 <style scoped>
 .card {
   /* width: 24vw; */
-  height: 30vh;
+  height: fit-content;
   background-color: #f7f7f7;
   margin: 0 1% 1% 1%;
 }
 
 .event_card_title {
   display: flex;
-  margin-top: 5%;
-  margin-bottom: 2%;
+  margin-top: 2%;
+  /*margin-bottom: 2%;*/
 }
 
 .iconfont {
@@ -69,7 +69,7 @@ export default {
 
 .card_profile {
   display: flex;
-  flex-basis: 35%;
+  /*flex-basis: 35%;*/
   margin-left: 0.3vh;
   align-items: center;
   justify-content: space-between;
@@ -89,13 +89,13 @@ export default {
 }
 
 .card_img {
-  flex-basis: 18%;
+  flex-basis: 22%;
 }
 
 .card_img > img {
-  margin-top: 0.5vh;
-  height: 6vh;
-  width: 6vh;
+  margin-top: 0;
+  height: 5vh;
+  width: 5vh;
 }
 
 
@@ -114,12 +114,12 @@ export default {
 .card_create {
   display: flex;
   align-items: center;
-  flex-basis: 25%;
+  /*flex-basis: 25%;*/
   justify-content: space-between;
   border-bottom: 1px solid #b6b6b6;
   border-top: 1px solid #b6b6b6;
   color: #b6b6b6;
-  font-size: 1.2vw;
+  font-size: 1.15vw;
   margin: 1% 5% 0 4%;
 }
 
@@ -130,8 +130,8 @@ export default {
 
 .profile_photo > img {
   margin: 0;
-  height: 6vh;
-  width: 6vh;
+  height: 5vh;
+  width: 5vh;
 
 }
 
@@ -139,7 +139,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  flex-basis: 21%;
+  /*flex-basis: 21%;*/
   font-size: 1.2vw;
   margin: 0 5%;
 }

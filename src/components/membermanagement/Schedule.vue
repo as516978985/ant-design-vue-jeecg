@@ -80,7 +80,7 @@ export default {
       }],
       addNoteContext: '',
       url: {
-        changeScheduleFlag: 'http://localhost:8080/jeecg-boot/users/changeScheduleFlag'
+        changeScheduleFlag: 'http://localhost:8080/jeecg-boot/user/changeScheduleFlag'
       }
     }
   },
@@ -105,8 +105,8 @@ export default {
       let { data } = await postAction(this.url.changeScheduleFlag, params)
       console.log('获得的数据为：', data)
       this.scheduleList =
-        [...data.filter(item => item.checkFlag === '0').sort(this.dataCompare('modifyTime', false)),
-          ...data.filter(item => item.checkFlag === '1').sort(this.dataCompare('modifyTime', true))]
+        [...data.filter(item => item.checkFlag === 0).sort(this.dataCompare('modifyTime', false)),
+          ...data.filter(item => item.checkFlag === 1).sort(this.dataCompare('modifyTime', true))]
     },
 
     /**
@@ -129,12 +129,7 @@ export default {
       }
     },
     checkNote(item) {
-      if (item.checkFlag == 1) {
-        item.checkFlag = 0
-      } else {
-        item.checkFlag = 1
-      }
-      console.log('勾选了笔记：', item)
+      this.$emit('changeNoteFlag', item)
     },
 
 
@@ -143,11 +138,11 @@ export default {
      * @returns {Promise<void>}
      */
     async addNote() {
-      console.log("checkDay",this.checkedDay)
-      console.log("看一下输入的内容",this.addNoteContext)
+      console.log('checkDay', this.checkedDay)
+      console.log('看一下输入的内容', this.addNoteContext)
 
-      console.log("子数据",this.addNoteContext)
-      this.$emit("addNote",this.addNoteContext)
+      console.log('子数据', this.addNoteContext)
+      this.$emit('addNote', this.addNoteContext)
       this.addNoteContext = ''
     }
   }

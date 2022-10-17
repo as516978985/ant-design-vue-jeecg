@@ -36,7 +36,7 @@ export default {
       attentions: [],
 
       url: {
-        changeAttention: 'http://localhost:8080/jeecg-boot/users/changeEventCardAttention/'
+        changeAttention: 'http://localhost:8080/jeecg-boot/user/changeEventCardAttention/'
       }
 
     }
@@ -58,18 +58,11 @@ export default {
       params.append('id', `${val.id}`)
       let { data } = await postAction(this.url.changeAttention, params)
       this.itemList = [...data.filter(item => {
-        return item.attentionFlag === '0'
+        return item.attentionFlag === 0
       })]
       this.attentions = [...data.filter(item => {
-        return item.attentionFlag === '1'
+        return item.attentionFlag === 1
       })]
-
-      // this.itemList = [...val.filter(item => {
-      //   return item.attentionFlag === '0'
-      // })]
-      // this.attentions = [...val.filter(item => {
-      //   return item.attentionFlag === '1'
-      // })]
     }
   }
 }
@@ -100,10 +93,8 @@ export default {
   display: flex;
   flex-direction: column;
   flex-basis: 31%;
-  height: 30vh;
-  margin: 0 1.5vh 4vh 1.5vh;
-  /*border: 1px solid black;*/
-  /*align-items: center;*/
+  height: fit-content;
+  margin: 0 1vh 1.8vh 1vh;
   background-color: #f7f7f7;
 }
 

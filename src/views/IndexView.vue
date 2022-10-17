@@ -38,7 +38,7 @@
         </div>
         <!-- 日程 -->
         <div class='schedule'>
-          <schedule ref='scheduleRef' @addNote='increaseNote' />
+          <schedule ref='scheduleRef' @addNote='increaseNote' @changeNoteFlag='changeNoteStatus' />
         </div>
       </div>
 
@@ -78,12 +78,13 @@ export default {
       cardList: [],
       checkedDay: '',
       url: {
-        taskCard: 'http://localhost:8080/jeecg-boot/users/getTaskCard',
-        scheduleCard: 'http://localhost:8080/jeecg-boot/users/getScheduleCard',
-        userCard: 'http://localhost:8080/jeecg-boot/users/getUserInfo',
-        eventCard: 'http://localhost:8080/jeecg-boot/users/getEventCard',
-        getNote: 'http://localhost:8080/jeecg-boot/users/getNote',
-        addNote: 'http://localhost:8080/jeecg-boot/users/addNote'
+        taskCard: 'http://localhost:8080/jeecg-boot/user/getTaskCard',
+        scheduleCard: 'http://localhost:8080/jeecg-boot/user/getScheduleCard',
+        userCard: 'http://localhost:8080/jeecg-boot/user/getUserInfo',
+        eventCard: 'http://localhost:8080/jeecg-boot/user/getEventCard',
+        getNote: 'http://localhost:8080/jeecg-boot/user/getNote',
+        addNote: 'http://localhost:8080/jeecg-boot/user/addNote',
+        changeNoteStatus: 'http://localhost:8080/jeecg-boot/user/changeNote/'
       }
     }
   },
@@ -99,8 +100,8 @@ export default {
       let { data } = await postAction(this.url.addNote, params)
       this.$nextTick(() => {
         this.$refs.scheduleRef.noteList =
-          [...data.filter(item => item.checkFlag === '0'),
-            ...data.filter(item => item.checkFlag === '1')]
+          [...data.filter(item => item.checkFlag === 0),
+            ...data.filter(item => item.checkFlag === 1)]
       })
 
 
@@ -189,10 +190,10 @@ export default {
     async getEventCard() {
       const { data } = await getAction(this.url.eventCard + `/${this.userId}`)
       this.$refs.eventAreaRef.itemList = [...data.filter(item => {
-        return item.attentionFlag === '0'
+        return item.attentionFlag === 0
       })]
       this.$refs.eventAreaRef.attentions = [...data.filter(item => {
-        return item.attentionFlag === '1'
+        return item.attentionFlag === 1
       })]
     },
 
@@ -213,8 +214,8 @@ export default {
       const { data } = await postAction(this.url.scheduleCard, params)
       this.$nextTick(() => {
         this.$refs.scheduleRef.scheduleList =
-          [...data.filter(item => item.checkFlag === '0').sort(this.dataCompare('modifyTime', false)),
-            ...data.filter(item => item.checkFlag === '1').sort(this.dataCompare('modifyTime', true))]
+          [...data.filter(item => item.checkFlag === 0).sort(this.dataCompare('modifyTime', false)),
+            ...data.filter(item => item.checkFlag === 1).sort(this.dataCompare('modifyTime', true))]
       })
     },
 
@@ -247,8 +248,16 @@ export default {
       console.log('看一下笔记数据', data)
       this.$nextTick(() => {
         this.$refs.scheduleRef.noteList =
-          [...data.filter(item => item.checkFlag === '0'),
-            ...data.filter(item => item.checkFlag === '1')]
+          [...data.filter(item => item.checkFlag === 0),
+            ...data.filter(item => item.checkFlag === 1)]
+      })
+    },
+    async changeNoteStatus(item) {
+      let { data } = await postAction(this.url.changeNoteStatus + `${item.id}`)
+      this.$nextTick(() => {
+        this.$refs.scheduleRef.noteList =
+          [...data.filter(item => item.checkFlag === 0),
+            ...data.filter(item => item.checkFlag === 1)]
       })
     }
   }

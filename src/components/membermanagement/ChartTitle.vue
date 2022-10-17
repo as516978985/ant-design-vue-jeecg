@@ -100,7 +100,7 @@ span {
 .title_right {
     display: flex;
     flex-shrink: 0;
-    height: 98%;
+    /*height: 98%;*/
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
@@ -111,7 +111,7 @@ select {
     background-color: #f7f8f8;
     border: 0;
     font-size: 1vw;
-    height: 80%;
+    height: 60%;
     width: 8vw;
     text-align: center;
     margin-right: 10%;

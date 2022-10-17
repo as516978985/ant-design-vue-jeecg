@@ -1,5 +1,5 @@
 <template>
-  <div class='chart'>
+  <div class='chartContent'>
     <div id='main'></div>
 
   </div>
@@ -39,7 +39,8 @@ export default {
         //与div的距离
         grid: {
           left: '3%',
-          right: '3%',
+          // right: '3%',
+          right: '3.5%',
           top: '5%',
           bottom: '15%'
         },
@@ -115,36 +116,36 @@ export default {
 </script>
 
 <style scoped>
-.chart {
+.chartContent {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /*flex-basis: 40%;*/
-  margin-bottom: 2%;
   flex-shrink: 0;
-  /*添加下面代码！！！*/
-  /*width: 70.8vw;*/
-  /*height: 30vh;*/
-  /*flex-basis: 85%;*/
   background-color: white;
 }
 
 #main {
-  width: 100%;
-  /*height: 100%;*/
-  /*修改为下面代码*/
-  /*width: 74.5vw;*/
+  width: 100% !important;
   height: 34vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/*#main div {*/
-/*  width: 100%;*/
-/*}*/
+#main div {
+  width: 100% !important;
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
+}
 
 /*增加下面代码*/
 canvas {
   width: 100px !important;
   height: 34.1% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   /*width: 69.5vw !important;*/
   /*height: 34.1vh !important;*/
 }
